@@ -1,6 +1,100 @@
-type ExampleEntity @entity {
+type Factory @entity {
+  # factory address
   id: ID!
-  count: BigInt!
-  fee: Int! # uint24
-  tickSpacing: Int! # int24
+}
+
+type Pool @entity {
+  # pool address
+  id: ID!
+  # creation
+  createdAtTimestamp: BigInt!
+  # block pool was created at
+  createdAtBlockNumber: BigInt!
+  # current price tracker
+  sqrtPrice: BigInt!
+  # token0
+  token0: Token!
+  # token1
+  token1: Token!
+  # fee amount
+  feeTier: BigInt!
+  # token0 per token1
+  token0Price: BigDecimal!
+  # token1 per token0
+  token1Price: BigDecimal!
+  # current tick
+  tick: BigInt
+}
+
+type Transaction @entity {
+  # txn hash
+  id: ID!
+  # block txn was included in
+  blockNumber: BigInt!
+  # timestamp txn was confirmed
+  timestamp: BigInt!
+  # gas used during txn execution
+  gasUsed: BigInt!
+  gasPrice: BigInt!
+}
+
+type Token @entity {
+  # token address
+  id: ID!
+  # token symbol
+  symbol: String!
+  # token name
+  name: String!
+  # token decimals
+  decimals: BigInt!
+  # token total supply
+  totalSupply: BigInt!
+}
+
+type Swap @entity {
+  # transaction hash + "#" + index in swaps Transaction array
+  id: ID!
+  # swap type
+  type: String!
+  # pointer to transaction
+  transaction: Transaction!
+  # timestamp of transaction
+  timestamp: BigInt!
+  # pool swap occured within
+  pool: Pool
+  # pair swap occured within
+  pair: Pair
+  # allow indexing by tokens
+  token0: Token!
+  # allow indexing by tokens
+  token1: Token!
+  # sender of the swap
+  sender: Bytes!
+  # recipient of the swap
+  recipient: Bytes!
+  # txn origin
+  origin: Bytes! # the EOA that initiated the txn
+  # delta of token0 swapped
+  amount0: BigDecimal!
+  # delta of token1 swapped
+  amount1: BigDecimal!
+  # the tick after the swap
+  tick: BigInt
+  # index within the txn
+  logIndex: BigInt
+}
+
+type Pair @entity {
+  # Contract address
+  id: ID!
+  name: String!
+  token0: Token!
+  token1: Token!
+  reserve0: BigDecimal!
+  reserve1: BigDecimal!
+  totalSupply: BigDecimal!
+  token0Price: BigDecimal!
+  token1Price: BigDecimal!
+  timestamp: BigInt!
+  block: BigInt!
 }

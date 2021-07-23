@@ -1,6 +1,8 @@
 {
   "name": "swaps",
-  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "repository": "https://github.com/jona/swaps",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
@@ -9,8 +11,9 @@
     "remove-local": "graph remove --node http://localhost:8020/ swaps",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 swaps"
   },
-  "dependencies": {
-    "@graphprotocol/graph-cli": "0.21.0",
-    "@graphprotocol/graph-ts": "0.20.0"
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.21.0",
+    "@graphprotocol/graph-ts": "^0.20.0",
+    "@sushiswap/core": "^1.4.2"
   }
 }

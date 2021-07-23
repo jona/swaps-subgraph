@@ -1,29 +1,118 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
+# features:
+#   - nonFatalErrors
+
 dataSources:
   - kind: ethereum/contract
-    name: Factory
+    name: UniswapFactory
     network: mainnet
     source:
       address: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
       abi: Factory
+      startBlock: 12369621
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.2
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
+      file: ./src/mappings/uniswap/handlers.ts
       entities:
-        - FeeAmountEnabled
-        - OwnerChanged
-        - PoolCreated
+        - Pool
+        - Token
       abis:
         - name: Factory
           file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Pool
+          file: ./abis/Pool.json
       eventHandlers:
-        - event: FeeAmountEnabled(indexed uint24,indexed int24)
-          handler: handleFeeAmountEnabled
-        - event: OwnerChanged(indexed address,indexed address)
-          handler: handleOwnerChanged
         - event: PoolCreated(indexed address,indexed address,indexed uint24,int24,address)
           handler: handlePoolCreated
-      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
+    name: SushiSwapFactory
+    network: mainnet
+    source:
+      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
+      abi: Factory
+      startBlock: 10794229
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/sushiswap/handlers.ts
+      entities:
+        - Factory
+      abis:
+        - name: Factory
+          file: ./node_modules/@sushiswap/core/build/abi/UniswapV2Factory.json
+        - name: Pair
+          file: ./node_modules/@sushiswap/core/build/abi/UniswapV2Pair.json
+        - name: SushiToken
+          file: ./node_modules/@sushiswap/core/build/abi/SushiToken.json
+        - name: ERC20
+          file: ./node_modules/@sushiswap/core/build/abi/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: onPairCreated
+
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: mainnet
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/uniswap/handlers.ts
+      entities:
+        - Swap
+        - Token
+        - Pool
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Initialize(uint160,int24)
+          handler: handleInitialize
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+
+  - kind: ethereum/contract
+    name: Pair
+    network: mainnet
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/sushiswap/handlers.ts
+      entities:
+        - Swap
+        - Token
+        - Pair
+      abis:
+        - name: Pair
+          file: ./node_modules/@sushiswap/core/build/abi/UniswapV2Pair.json
+        - name: Factory
+          file: ./node_modules/@sushiswap/core/build/abi/UniswapV2Factory.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
